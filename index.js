@@ -2,14 +2,15 @@ import 'dotenv/config'
 
 import express from 'express';
 import mongoose from 'mongoose';
-import passport from 'passport';
+
 import jwt from 'jsonwebtoken';
-import passportConfig from './passportConfig.js'
-var x = passportConfig(passport);
+
+import auth from "./routes/auth.js"
+
+
 const app = express();
 app.use(express.json());
-
-const port = 8080;
+app.use("/auth", auth)
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
@@ -25,29 +26,10 @@ app.get('/', (req,res) => {
     res.json({message: "connected"})
 })
 
-// Redirect the user to the Google signin page
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
-);
 
-// Retrieve user data using the access token received
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { session: false }),
-  (req, res) => {
-    res.redirect("/profile");
-  }
-);
-
-// profile route after successful sign in
-app.get("/profile", (req, res) => {
-  console.log(req);
-  res.send("Welcome");
-});
 
 
 app.listen(process.env.PORT || port, () => {
-    console.log(`Server listening on https://localhost:${port}`);
+    console.log(`Server listening on http://localhost:${process.env.PORT}`);
     console.log("Trying to connect to database...");
   });

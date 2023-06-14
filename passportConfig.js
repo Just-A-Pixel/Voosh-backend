@@ -1,5 +1,6 @@
 import { Strategy as GoogleStrategy } from "passport-google-oauth2";
-import User from "./userModel.js";
+import { Strategy as JwtStrategy, ExtractJwt} from "passport-jwt";
+import User from "./models/userModel.js";
 
 const passportConfig = (passport) => {
     passport.use(new GoogleStrategy({
@@ -22,17 +23,37 @@ const passportConfig = (passport) => {
               google: {
                 id: profile.id,
                 name: profile.displayName,
-                email: profile.emails[0].value
-              }
+              },
+              email: profile.emails[0].value,
+              password: null
             });
             await newUser.save();
             return done(null, newUser);
         } catch (error) {
-            console.log("dawdawdaw")
             return done(error, false)
         }
       }
     ));
+    passport.use(
+      new JwtStrategy(
+        {
+          jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
+          secretOrKey: "secretKey",
+        },
+        async (jwtPayload, done) => {
+          console.log("dwadwa")
+          try {
+            // Extract user
+            const user = jwtPayload.user;
+            console.log("dwadwadad")
+            done(null, user); 
+          } catch (error) {
+            console.log(error)
+            done(error, false);
+          }
+        }
+      )
+    );
 }
 
 export default passportConfig;

@@ -7,11 +7,16 @@ const UserSchema = new mongoose.Schema({
     },
     name: {
       type: String,
-    },
-    email: {
-      type: String,
-    },
+    }
   },
+  email: {
+      type: String,
+  },
+  password: {
+    type: String,
+  },
+  items: [],
+  
 });
 const User = mongoose.model("User", UserSchema);
 
